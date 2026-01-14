@@ -184,17 +184,14 @@ export default function FocusLayer({ rows, focusedSet, setFocusedSet, totalFocus
             {focusedRows.map((r) => (
               <div
                 key={r.exe}
-                className="rounded-[14px] bg-white px-[14px] py-[12px] cursor-grab active:cursor-grabbing"
+                className="rounded-[16px] bg-white px-[14px] py-[12px] cursor-grab active:cursor-grabbing"
                 style={{ boxShadow: "0 0 0 1px rgba(0,0,0,0.06)", touchAction: "none" }}
                 onPointerDown={(e) => beginDrag(e, r.exe, "focus")}
                 title="Drag to list to remove from Focus"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="truncate text-[14px] font-semibold">{displayName(r.exe)}</div>
-                    <div className="mt-1 text-[11px] font-medium text-black/45">{r.exe}</div>
-                  </div>
-                  <div className="shrink-0 text-[13px] font-semibold">{formatHMS(r.sec)}</div>
+                <div className="flex items-center justify-between gap-3">
+                    <div className="truncate text-[16px] font-semibold">{displayName(r.exe)}</div>
+                    <div className="mt-1 text-[14px] font-medium text-black/45">{r.exe}</div>
                 </div>
               </div>
             ))}
@@ -203,7 +200,7 @@ export default function FocusLayer({ rows, focusedSet, setFocusedSet, totalFocus
       </div>
 
       {/* Distraction */}
-      <div className="mt-[14px] text-[13px] font-medium shrink-0">Distraction</div>
+      <div className="mt-[32px] text-[13px] font-medium shrink-0">Distraction</div>
 
       {/* 핵심: flex-1 + min-h-0 + overflow-y-auto */}
       <div
@@ -226,11 +223,8 @@ export default function FocusLayer({ rows, focusedSet, setFocusedSet, totalFocus
               title="Drag to Focus"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="truncate text-[14px] font-semibold">{displayName(r.exe)}</div>
-                  <div className="mt-1 text-[11px] font-medium text-black/45">{r.exe}</div>
-                </div>
-                <div className="shrink-0 text-[13px] font-semibold">{formatHMS(r.sec)}</div>
+                  <div className="truncate text-[15px] font-semibold">{displayName(r.exe)}</div>
+                  <div className="mt-1 text-[13px] font-medium text-black/45">{r.exe}</div>
               </div>
             </div>
           ))
