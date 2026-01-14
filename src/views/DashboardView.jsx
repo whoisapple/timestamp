@@ -1,6 +1,6 @@
 // src/views/DashboardView.jsx
 import FocusLayer from "../components/FocusLayer";
-import { formatHMS } from "../lib/format";
+import { formatAppName, formatHMS } from "../lib/format";
 import UsageBars from "../components/UsageBars";
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
@@ -105,7 +105,7 @@ export default function DashboardView({
               >
                 <div className="text-[13px] font-medium">Top App</div>
                 <div className="mt-[4px] text-[28px] font-semibold leading-none line-clamp-1">
-                  {topApp}
+                  {formatAppName(topApp)}
                 </div>
               </div>
             </div>

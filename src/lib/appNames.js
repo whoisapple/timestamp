@@ -15,9 +15,6 @@ export const APP_NAME_MAP = {
     "com.apple.Safari": "Safari",
   };
   
-  export function displayName(exe) {
-    if (!exe) return "-";
-    if (APP_NAME_MAP[exe]) return APP_NAME_MAP[exe];
-    return exe.replace(/\.exe$/i, "");
-  }
-  
+export function displayName(appKey, fallback) {
+  return fallback || APP_NAME_MAP[appKey] || appKey;
+}

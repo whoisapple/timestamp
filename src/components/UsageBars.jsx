@@ -1,7 +1,6 @@
 // src/components/UsageBars.jsx
 import { useMemo } from "react";
-import { displayName } from "../lib/appNames";
-import { formatHMS } from "../lib/format";
+import { formatHMS, formatAppName } from "../lib/format";
 
 export default function UsageBars({
   rows,
@@ -52,7 +51,7 @@ export default function UsageBars({
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <div className="truncate text-[16px] font-semibold">
-                          {displayName(r.exe)}
+                          {formatAppName(r.exe)}
                         </div>
                         {isFocused ? (
                           <span className="rounded-full bg-black px-2 py-[2px] text-[10px] font-semibold text-white">
@@ -76,7 +75,9 @@ export default function UsageBars({
                       className="h-full rounded-full"
                       style={{
                         width: `${pct * 100}%`,
-                        background: isFocused ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.35)",
+                        background: isFocused
+                          ? "rgba(0,0,0,0.85)"
+                          : "rgba(0,0,0,0.35)",
                       }}
                     />
                   </div>

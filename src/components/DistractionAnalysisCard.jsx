@@ -1,6 +1,5 @@
 // src/components/DistractionAnalysisCard.jsx
-import { formatHMS } from "../lib/format";
-import { displayName } from "../lib/appNames";
+import { formatHMS, formatAppName } from "../lib/format";
 
 function hourLabel(h) {
   const s = String(h).padStart(2, "0");
@@ -16,7 +15,8 @@ export default function DistractionAnalysisCard({
   hourlyDistraction = [],
 }) {
   const distractionSec = Math.max(0, (totalActive || 0) - (totalFocus || 0));
-  const distractionRate = totalActive > 0 ? (distractionSec / totalActive) * 100 : 0;
+  const distractionRate =
+    totalActive > 0 ? (distractionSec / totalActive) * 100 : 0;
 
   // rows에서 Focus 제외한 앱들 중 가장 큰 것 = Top Distraction
   const topDistraction = (() => {
@@ -31,7 +31,11 @@ export default function DistractionAnalysisCard({
 
   // 시간대: hourlyDistraction[0..23]에서 max hour 찾기
   const mostDistractedHour = (() => {
-    if (!Array.isArray(hourlyDistraction) || hourlyDistraction.length !== 24) return null;
+    if (
+      !Array.isArray(hourlyDistraction) ||
+      hourlyDistraction.length !== 24
+    )
+      return null;
     let bestH = 0;
     let bestV = hourlyDistraction[0] || 0;
     for (let h = 1; h < 24; h++) {
@@ -51,7 +55,9 @@ export default function DistractionAnalysisCard({
 
       <div className="mt-[10px] grid grid-cols-2 gap-x-[14px] gap-y-[12px]">
         <div>
-          <div className="text-[11px] font-medium text-black/45">Outside Focus</div>
+          <div className="text-[11px] font-medium text-black/45">
+            Outside Focus
+          </div>
           <div className="mt-[3px] text-[18px] font-semibold leading-none">
             {distractionRate.toFixed(0)}%
           </div>
@@ -61,29 +67,37 @@ export default function DistractionAnalysisCard({
         </div>
 
         <div>
-          <div className="text-[11px] font-medium text-black/45">Top Distraction</div>
+          <div className="text-[11px] font-medium text-black/45">
+            Top Distraction
+          </div>
           <div className="mt-[3px] text-[18px] font-semibold leading-none line-clamp-1">
-            {topDistraction ? displayName(topDistraction.exe) : "-"}
+            {topDistraction ? formatAppName(topDistraction.exe) : "-"}
           </div>
           <div className="mt-[3px] text-[11px] font-medium text-black/45">
-            {topDistraction ? formatHMS(topDistraction.seconds || 0) : "-"}
+            {topDistraction ? formatHMS(topDistraction.sec || 0) : "-"}
           </div>
         </div>
 
         <div className="col-span-2">
-          <div className="text-[11px] font-medium text-black/45">Most distracted hour</div>
+          <div className="text-[11px] font-medium text-black/45">
+            Most distracted hour
+          </div>
           <div className="mt-[3px] text-[16px] font-semibold leading-none">
             {mostDistractedHour ? hourLabel(mostDistractedHour.hour) : "-"}
           </div>
           <div className="mt-[3px] text-[11px] font-medium text-black/45">
-            {mostDistractedHour ? formatHMS(mostDistractedHour.sec) : "오늘 누적이 더 필요해요"}
+            {mostDistractedHour
+              ? formatHMS(mostDistractedHour.sec)
+              : "오늘 누적이 더 필요해요"}
           </div>
         </div>
       </div>
 
-      {/* 옵션: 상위 distraction 3개 */}
+      {/* 상위 distraction 3개 */}
       <div className="mt-auto pt-[12px]">
-        <div className="text-[11px] font-medium text-black/45">Top distractions (non-focus)</div>
+        <div className="text-[11px] font-medium text-black/45">
+          Top distractions (non-focus)
+        </div>
         <div className="mt-[8px] space-y-[6px]">
           {rows
             .filter((r) => r?.exe && !focusedSet?.has(r.exe))
@@ -91,10 +105,10 @@ export default function DistractionAnalysisCard({
             .map((r) => (
               <div key={r.exe} className="flex items-center justify-between">
                 <div className="text-[12px] font-semibold text-black/80 line-clamp-1">
-                  {displayName(r.exe)}
+                  {formatAppName(r.exe)}
                 </div>
                 <div className="text-[12px] font-medium text-black/45">
-                  {formatHMS(r.seconds || 0)}
+                  {formatHMS(r.sec || 0)}
                 </div>
               </div>
             ))}

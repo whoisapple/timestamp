@@ -17,6 +17,7 @@ mod worklog_store;
 pub struct ForegroundApp {
   pub exe: String, // Windows: "Code.exe" / macOS: "com.microsoft.VSCode" (bundle id)
   pub pid: u32,    // macOS에서 PID 못 구하면 0
+  pub name: String,  // ✅ 표시명
 }
 
 #[tauri::command]
@@ -88,10 +89,7 @@ fn get_last_200_days(app: tauri::AppHandle) -> Result<Vec<worklog_store::DayStat
 
 #[tauri::command]
 fn debug_store_dir(app: tauri::AppHandle) -> Result<String, String> {
-  let dir = app
-    .path()
-    .app_data_dir()
-    .map_err(|e| e.to_string())?;
+let dir = app.path().app_data_dir().unwrap();
   Ok(dir.to_string_lossy().to_string())
 }
 

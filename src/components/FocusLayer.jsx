@@ -1,7 +1,6 @@
 // src/components/FocusLayer.jsx
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { displayName } from "../lib/appNames";
-import { formatHMS } from "../lib/format";
+import { formatHMS, formatAppName } from "../lib/format";
 const MAX_FOCUS = 5;
 
 export default function FocusLayer({ rows, focusedSet, setFocusedSet, totalFocus }) {
@@ -190,7 +189,7 @@ export default function FocusLayer({ rows, focusedSet, setFocusedSet, totalFocus
                 title="Drag to list to remove from Focus"
               >
                 <div className="flex items-center justify-between gap-3">
-                    <div className="truncate text-[16px] font-semibold">{displayName(r.exe)}</div>
+                    <div className="truncate text-[16px] font-semibold">{formatAppName(r.exe)}</div>
                     <div className="mt-1 text-[14px] font-medium text-black/45">{r.exe}</div>
                 </div>
               </div>
@@ -223,7 +222,7 @@ export default function FocusLayer({ rows, focusedSet, setFocusedSet, totalFocus
               title="Drag to Focus"
             >
               <div className="flex items-start justify-between gap-3">
-                  <div className="truncate text-[15px] font-semibold">{displayName(r.exe)}</div>
+                  <div className="truncate text-[15px] font-semibold">{formatAppName(r.exe)}</div>
                   <div className="mt-1 text-[13px] font-medium text-black/45">{r.exe}</div>
               </div>
             </div>
@@ -248,7 +247,7 @@ export default function FocusLayer({ rows, focusedSet, setFocusedSet, totalFocus
             opacity: 0.92,
           }}
         >
-          {displayName(drag.exe)}
+          {formatAppName(drag.exe)}
         </div>
       ) : null}
     </div>
