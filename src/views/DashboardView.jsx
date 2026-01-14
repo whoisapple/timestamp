@@ -1,10 +1,7 @@
+// src/views/DashboardView.jsx
 import FocusLayer from "../components/FocusLayer";
 import { formatHMS } from "../lib/format";
 import { displayName } from "../lib/appNames";
-import { useCanvasZoom } from "../hooks/useCanvasZoom";
-
-const DASH_W = 1440;
-const DASH_H = 1024;
 
 export default function DashboardView({
   onClickTimer,
@@ -27,178 +24,120 @@ export default function DashboardView({
   const PANEL = "#F6F6F4";
   const INSET = "0 0 0 1px rgba(0,0,0,0.06)";
 
-  const { zoom } = useCanvasZoom(DASH_W, DASH_H);
-
   return (
-    <div className="h-screen w-screen" style={{ background: BG }}>
+    <div className="min-h-screen w-full overflow-x-hidden" style={{ background: BG }}>
+      {/* center + max width */}
       <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: DASH_W,
-          height: DASH_H,
-          zoom,
-          fontFamily: FONT_FAMILY,
-          color: "#0B0B0B",
-        }}
+        className="mx-auto w-full max-w-[1440px] px-[24px] pt-[24px] pb-[24px] h-screen"
+        style={{ fontFamily: FONT_FAMILY, color: "#0B0B0B" }}
       >
-        <div className="h-full w-full px-[24px] pt-[26px] pb-[30px]">
-          {/* Top bar */}
-          <div className="flex items-center">
-            <div className="flex items-center gap-3">
-            <svg width="130" height="24" viewBox="0 0 130 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0.206645 15.5667C-0.231096 13.3914 0.0305609 11.1333 0.954115 9.11592C1.87767 7.09857 3.41571 5.42559 5.34779 4.33676C7.27987 3.24794 9.50681 2.79916 11.7094 3.05475C13.9121 3.31034 15.9773 4.25718 17.6091 5.75957C19.2409 7.26195 20.3556 9.24275 20.7934 11.4181C21.2311 13.5934 20.9694 15.8515 20.0459 17.8689C19.1223 19.8862 17.5843 21.5592 15.6522 22.648C13.7201 23.7369 11.4932 24.1856 9.29056 23.9301L9.53245 21.8425C11.2945 22.047 13.0761 21.688 14.6218 20.8169C16.1674 19.9459 17.3979 18.6075 18.1367 16.9936C18.8755 15.3797 19.0849 13.5732 18.7347 11.8329C18.3845 10.0927 17.4928 8.50804 16.1873 7.30613C14.8818 6.10423 13.2296 5.34676 11.4675 5.14228C9.70545 4.93781 7.9239 5.29683 6.37823 6.16789C4.83256 7.03895 3.60214 8.37734 2.86329 9.99122C2.12445 11.6051 1.91512 13.4116 2.26532 15.1519L0.206645 15.5667Z" fill="black"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M10.9024 15.062L14.0324 12.3425L12.9998 11.1524L11.0873 12.814V7.59324H9.51235V15.062H10.9024Z" fill="black"/>
-<path d="M5.59016 0H15.4098V1.88976H5.59016V0Z" fill="black"/>
-<path d="M34.14 19V6.48H29.8V4.8H40.2V6.48H35.86V19H34.14Z" fill="black"/>
-<path d="M46.0522 19V8.4H47.7322V19H46.0522ZM41.7922 19V17.52H51.3922V19H41.7922ZM41.9922 9.88V8.4H47.7322V9.88H41.9922ZM45.8922 6.74V4.78H47.6522V6.74H45.8922Z" fill="black"/>
-<path d="M52.1844 19V8.4H53.7244L53.7844 10.76L53.5844 10.72C53.7044 9.93333 53.9577 9.31333 54.3444 8.86C54.7444 8.39333 55.251 8.16 55.8644 8.16C56.491 8.16 56.971 8.38667 57.3044 8.84C57.651 9.29333 57.8644 9.96 57.9444 10.84H57.7444C57.8644 10.0133 58.131 9.36 58.5444 8.88C58.971 8.4 59.5044 8.16 60.1444 8.16C60.9977 8.16 61.6177 8.45333 62.0044 9.04C62.391 9.62667 62.5844 10.6 62.5844 11.96V19H60.9044V12.2C60.9044 11.2533 60.8044 10.5933 60.6044 10.22C60.4044 9.83333 60.091 9.64 59.6644 9.64C59.3844 9.64 59.1377 9.73333 58.9244 9.92C58.711 10.0933 58.5377 10.3733 58.4044 10.76C58.2844 11.1467 58.2244 11.64 58.2244 12.24V19H56.5444V12.2C56.5444 11.2933 56.4444 10.64 56.2444 10.24C56.0577 9.84 55.7444 9.64 55.3044 9.64C55.0244 9.64 54.7777 9.73333 54.5644 9.92C54.351 10.0933 54.1777 10.3733 54.0444 10.76C53.9244 11.1467 53.8644 11.64 53.8644 12.24V19H52.1844Z" fill="black"/>
-<path d="M68.7566 19.24C67.7566 19.24 66.8899 19.0133 66.1566 18.56C65.4366 18.1067 64.8766 17.4667 64.4766 16.64C64.0899 15.8 63.8966 14.82 63.8966 13.7C63.8966 12.58 64.0899 11.6067 64.4766 10.78C64.8766 9.95333 65.4299 9.31333 66.1366 8.86C66.8566 8.39333 67.7032 8.16 68.6766 8.16C69.5966 8.16 70.4099 8.38 71.1166 8.82C71.8232 9.24667 72.3766 9.87333 72.7766 10.7C73.1766 11.5267 73.3766 12.5333 73.3766 13.72V14.22H65.6566C65.7232 15.3533 66.0232 16.2067 66.5566 16.78C67.1032 17.3533 67.8366 17.64 68.7566 17.64C69.4499 17.64 70.0166 17.48 70.4566 17.16C70.9099 16.8267 71.2232 16.3933 71.3966 15.86L73.1966 16C72.9166 16.9467 72.3832 17.7267 71.5966 18.34C70.8232 18.94 69.8766 19.24 68.7566 19.24ZM65.6566 12.74H71.5366C71.4566 11.7133 71.1566 10.96 70.6366 10.48C70.1166 10 69.4632 9.76 68.6766 9.76C67.8632 9.76 67.1899 10.0133 66.6566 10.52C66.1366 11.0133 65.8032 11.7533 65.6566 12.74Z" fill="black"/>
-<path d="M79.9887 19.32C78.9887 19.32 78.1021 19.1133 77.3288 18.7C76.5554 18.2867 75.9354 17.72 75.4688 17C75.0021 16.2667 74.7288 15.42 74.6488 14.46L76.4487 14.34C76.5421 15.0467 76.7421 15.6467 77.0488 16.14C77.3688 16.6333 77.7754 17.0067 78.2688 17.26C78.7754 17.5133 79.3621 17.64 80.0287 17.64C80.6954 17.64 81.2554 17.56 81.7087 17.4C82.1621 17.2267 82.5021 16.98 82.7288 16.66C82.9688 16.3267 83.0888 15.9333 83.0888 15.48C83.0888 15.0267 82.9821 14.6333 82.7688 14.3C82.5688 13.9533 82.1821 13.6333 81.6087 13.34C81.0488 13.0467 80.2154 12.7467 79.1087 12.44C78.1221 12.16 77.3221 11.8533 76.7087 11.52C76.1087 11.1867 75.6687 10.78 75.3887 10.3C75.1221 9.82 74.9887 9.22667 74.9887 8.52C74.9887 7.72 75.1754 7.02 75.5488 6.42C75.9354 5.80667 76.4821 5.33333 77.1888 5C77.8954 4.65333 78.7354 4.48 79.7087 4.48C80.6821 4.48 81.5154 4.68 82.2087 5.08C82.9021 5.46667 83.4487 6 83.8487 6.68C84.2621 7.36 84.5221 8.13333 84.6288 9L82.8288 9.12C82.7487 8.54667 82.5821 8.04 82.3288 7.6C82.0754 7.14667 81.7288 6.79333 81.2887 6.54C80.8487 6.28667 80.3087 6.16 79.6687 6.16C78.7887 6.16 78.0887 6.37333 77.5687 6.8C77.0488 7.21333 76.7887 7.76 76.7887 8.44C76.7887 8.88 76.8821 9.24667 77.0687 9.54C77.2687 9.82 77.6154 10.0733 78.1087 10.3C78.6021 10.5133 79.2954 10.7467 80.1888 11C81.3488 11.32 82.2688 11.68 82.9488 12.08C83.6421 12.48 84.1354 12.96 84.4287 13.52C84.7354 14.0667 84.8887 14.7333 84.8887 15.52C84.8887 16.2667 84.6821 16.9267 84.2688 17.5C83.8554 18.0733 83.2821 18.52 82.5488 18.84C81.8154 19.16 80.9621 19.32 79.9887 19.32Z" fill="black"/>
-<path d="M92.5209 19C91.4943 19 90.7276 18.76 90.2209 18.28C89.7143 17.8 89.4609 17.0667 89.4609 16.08V5.92H91.1409V16.08C91.1409 16.5733 91.2543 16.94 91.4809 17.18C91.7076 17.4067 92.0543 17.52 92.5209 17.52H95.3609V19H92.5209ZM85.9609 9.88V8.4H95.3609V9.88H85.9609Z" fill="black"/>
-<path d="M100.753 19.24C100.086 19.24 99.4865 19.12 98.9531 18.88C98.4198 18.64 97.9998 18.3067 97.6931 17.88C97.3865 17.44 97.2331 16.9333 97.2331 16.36C97.2331 15.4533 97.4998 14.7533 98.0331 14.26C98.5798 13.7533 99.4331 13.3867 100.593 13.16L104.153 12.44C104.153 11.5333 103.946 10.86 103.533 10.42C103.133 9.98 102.553 9.76 101.793 9.76C101.06 9.76 100.486 9.92667 100.073 10.26C99.6598 10.58 99.3731 11.0467 99.2131 11.66L97.4331 11.52C97.6331 10.52 98.1065 9.71333 98.8531 9.1C99.6131 8.47333 100.593 8.16 101.793 8.16C103.073 8.16 104.066 8.54667 104.773 9.32C105.48 10.08 105.833 11.1333 105.833 12.48V16.88C105.833 17.12 105.886 17.2867 105.993 17.38C106.1 17.4733 106.26 17.52 106.473 17.52H107.153V19C107.073 19.0133 106.946 19.02 106.773 19.02C106.6 19.0333 106.433 19.04 106.273 19.04C105.82 19.04 105.433 18.9667 105.113 18.82C104.806 18.6733 104.573 18.44 104.413 18.12C104.253 17.7867 104.166 17.36 104.153 16.84H104.473C104.38 17.2933 104.153 17.7067 103.793 18.08C103.446 18.44 103.006 18.7267 102.473 18.94C101.94 19.14 101.366 19.24 100.753 19.24ZM100.913 17.76C101.633 17.76 102.233 17.64 102.713 17.4C103.193 17.1467 103.553 16.8 103.793 16.36C104.033 15.9067 104.153 15.3867 104.153 14.8V13.88L100.913 14.52C100.193 14.6533 99.6931 14.86 99.4131 15.14C99.1331 15.4067 98.9931 15.76 98.9931 16.2C98.9931 16.6933 99.1598 17.08 99.4931 17.36C99.8398 17.6267 100.313 17.76 100.913 17.76Z" fill="black"/>
-<path d="M108.145 19V8.4H109.685L109.745 10.76L109.545 10.72C109.665 9.93333 109.919 9.31333 110.305 8.86C110.705 8.39333 111.212 8.16 111.825 8.16C112.452 8.16 112.932 8.38667 113.265 8.84C113.612 9.29333 113.825 9.96 113.905 10.84H113.705C113.825 10.0133 114.092 9.36 114.505 8.88C114.932 8.4 115.465 8.16 116.105 8.16C116.959 8.16 117.579 8.45333 117.965 9.04C118.352 9.62667 118.545 10.6 118.545 11.96V19H116.865V12.2C116.865 11.2533 116.765 10.5933 116.565 10.22C116.365 9.83333 116.052 9.64 115.625 9.64C115.345 9.64 115.099 9.73333 114.885 9.92C114.672 10.0933 114.499 10.3733 114.365 10.76C114.245 11.1467 114.185 11.64 114.185 12.24V19H112.505V12.2C112.505 11.2933 112.405 10.64 112.205 10.24C112.019 9.84 111.705 9.64 111.265 9.64C110.985 9.64 110.739 9.73333 110.525 9.92C110.312 10.0933 110.139 10.3733 110.005 10.76C109.885 11.1467 109.825 11.64 109.825 12.24V19H108.145Z" fill="black"/>
-<path d="M120.137 22V8.4H121.698L121.737 10.8L121.497 10.68C121.764 9.85333 122.204 9.22667 122.817 8.8C123.444 8.37333 124.164 8.16 124.978 8.16C126.031 8.16 126.891 8.42 127.558 8.94C128.238 9.46 128.737 10.14 129.057 10.98C129.378 11.82 129.538 12.7267 129.538 13.7C129.538 14.6733 129.378 15.58 129.057 16.42C128.737 17.26 128.238 17.94 127.558 18.46C126.891 18.98 126.031 19.24 124.978 19.24C124.431 19.24 123.918 19.1467 123.438 18.96C122.971 18.7733 122.571 18.5133 122.237 18.18C121.917 17.8467 121.698 17.4533 121.577 17L121.817 16.72V22H120.137ZM124.817 17.64C125.737 17.64 126.458 17.2933 126.978 16.6C127.511 15.9067 127.777 14.94 127.777 13.7C127.777 12.46 127.511 11.4933 126.978 10.8C126.458 10.1067 125.737 9.76 124.817 9.76C124.204 9.76 123.671 9.90667 123.217 10.2C122.777 10.4933 122.431 10.9333 122.177 11.52C121.938 12.1067 121.817 12.8333 121.817 13.7C121.817 14.5667 121.938 15.2933 122.177 15.88C122.417 16.4667 122.764 16.9067 123.217 17.2C123.671 17.4933 124.204 17.64 124.817 17.64Z" fill="black"/>
-            </svg>
+        {/* Top bar */}
+        <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            <img src="./logo.svg" alt="" />
+          </div>
 
+          <div className="ml-auto flex items-center gap-3">
+            <button
+              className="h-[34px] rounded-full bg-black px-5 text-[14px] font-semibold text-white"
+              title="View Timer"
+              onClick={onClickTimer}
+            >
+              View Timer
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="mt-[18px] grid gap-[12px] grid-cols-1 xl:grid-cols-[1fr_420px] min-h-0">
+          {/* LEFT */}
+          <div className="min-h-0 min-w-0">
+            {/* KPI */}
+            <div className=" grid gap-[12px] grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+              <div
+                className="rounded-[22px] px-[22px] py-[16px]"
+                style={{ background: CARD, boxShadow: INSET }}
+              >
+                <div className="text-[13px] font-medium">Total Active Time</div>
+                <div className="mt-[10px] text-[34px] font-semibold leading-none">
+                  {formatHMS(totalActive)}
+                </div>
+              </div>
+
+              <div
+                className="rounded-[22px] px-[22px] py-[16px]"
+                style={{ background: CARD, boxShadow: INSET }}
+              >
+                <div className="text-[13px] font-medium">Total Focus Time</div>
+                <div className="mt-[10px] text-[34px] font-semibold leading-none">
+                  {formatHMS(totalFocus)}
+                </div>
+              </div>
+
+              <div
+                className="rounded-[22px] px-[22px] py-[16px]"
+                style={{ background: CARD, boxShadow: INSET }}
+              >
+                <div className="text-[13px] font-medium">Top App</div>
+                <div className="mt-[10px] text-[34px] font-semibold leading-none line-clamp-1">
+                  {topApp}
+                </div>
+              </div>
             </div>
 
-            <div className="ml-auto flex items-center gap-3">
-              <button
-                className="h-[34px] rounded-full bg-black px-5 text-[14px] font-semibold text-white"
-                title="View Timer"
-                onClick={onClickTimer}
+            {/* Middle */}
+            <div className="mt-[12px] grid gap-[12px] grid-cols-1 lg:grid-cols-2">
+              <div
+                className="rounded-[26px] p-[22px]"
+                style={{ background: PANEL, boxShadow: INSET, height: 380 }}
               >
-                View Timer
-              </button>
+                <div className="text-[13px] font-medium">Context Switches</div>
+                <div className="mt-[10px] text-[34px] font-semibold leading-none">
+                  {switches}
+                </div>
+                <div className="mt-2 text-[12px] font-medium text-black/55">
+                  Switches / hour: {switchesPerHour || 0}
+                </div>
+              </div>
 
+              <div
+                className="rounded-[26px] p-[22px]"
+                style={{ background: PANEL, boxShadow: INSET, height: 380 }}
+              >
+                <div className="text-[13px] font-medium">Current App</div>
+                <div className="mt-[10px] text-[24px] font-semibold leading-none">
+                  {displayName(current?.exe)}
+                </div>
+                <div className="mt-2 text-[12px] font-medium text-black/55">
+                  {current?.exe || "-"}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom placeholder */}
+            <div
+              className="mt-[12px] min-h-0 rounded-[26px] p-[22px]"
+              style={{ background: PANEL, boxShadow: INSET, minHeight: 220 }}
+            >
+              <div className="text-[13px] font-medium">최근 180일</div>
+              <div className="mt-[14px] h-[220px] rounded-[18px]" />
             </div>
           </div>
 
-          {/* Content */}
-          <div
-            className="mt-[18px] grid gap-[12px]"
-            style={{
-              height: "calc(1024px - 26px - 30px - 18px - 22px)",
-              gridTemplateColumns: "1fr 420px",
-            }}
-          >
-            {/* LEFT */}
-            <div className="min-h-0">
-              <div
-                className="flex items-center gap-[12px] rounded-[26px] px-[28px] py-[22px]"
-                style={{ background: CARD, boxShadow: INSET }}
-              >
-                <div className="text-[30px]">✅</div>
-                <div className="text-[30px] font-semibold tracking-tight">
-                  오늘도 열심히 집중하세요.
-                </div>
-              </div>
-
-              {/* KPI */}
-              <div
-                className="mt-[12px] grid gap-[12px]"
-                style={{ gridTemplateColumns: "1fr 1fr 1fr" }}
-              >
-                <div
-                  className="rounded-[22px] px-[22px] py-[16px]"
-                  style={{ background: CARD, boxShadow: INSET }}
-                >
-                  <div className="text-[13px] font-medium">
-                    Total Active Time
-                  </div>
-                  <div className="mt-[10px] text-[34px] font-semibold leading-none">
-                    {formatHMS(totalActive)}
-                  </div>
-                </div>
-
-                <div
-                  className="rounded-[22px] px-[22px] py-[16px]"
-                  style={{ background: CARD, boxShadow: INSET }}
-                >
-                  <div className="text-[13px] font-medium">
-                    Total Focus Time
-                  </div>
-                  <div className="mt-[10px] text-[34px] font-semibold leading-none">
-                    {formatHMS(totalFocus)}
-                  </div>
-                </div>
-
-                <div
-                  className="rounded-[22px] px-[22px] py-[16px]"
-                  style={{ background: CARD, boxShadow: INSET }}
-                >
-                  <div className="text-[13px] font-medium">Top App</div>
-                  <div className="mt-[10px] text-[34px] font-semibold leading-none line-clamp-1">
-                    {topApp}
-                  </div>
-                </div>
-              </div>
-
-              {/* Middle */}
-              <div
-                className="mt-[12px] grid gap-[12px]"
-                style={{ gridTemplateColumns: "1fr 1fr" }}
-              >
-                <div
-                  className="rounded-[26px] p-[22px]"
-                  style={{ background: PANEL, boxShadow: INSET, height: 380 }}
-                >
-                  <div className="text-[13px] font-medium">Context Switches</div>
-                  <div className="mt-[10px] text-[34px] font-semibold leading-none">
-                    {switches}
-                  </div>
-                  <div className="mt-2 text-[12px] font-medium text-black/55">
-                    Switches / hour: {switchesPerHour || 0}
-                  </div>
-                </div>
-
-                <div
-                  className="rounded-[26px] p-[22px]"
-                  style={{ background: PANEL, boxShadow: INSET, height: 380 }}
-                >
-                  <div className="text-[13px] font-medium">Current App</div>
-                  <div className="mt-[10px] text-[24px] font-semibold leading-none">
-                    {displayName(current?.exe)}
-                  </div>
-                  <div className="mt-2 text-[12px] font-medium text-black/55">
-                    {current?.exe || "-"}
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom placeholder */}
-              <div
-                className="mt-[12px] min-h-0 rounded-[26px] p-[22px]"
-                style={{
-                  background: PANEL,
-                  boxShadow: INSET,
-                  height:
-                    "calc(100% - 22px - 18px - 22px - 18px - 22px - 18px - 380px - 18px - 380px - 18px)",
-                  minHeight: 220,
-                }}
-              >
-                <div className="text-[13px] font-medium">최근 180일</div>
-                <div className="mt-[14px] h-[calc(100%-13px-14px)] rounded-[18px]" />
-              </div>
-            </div>
-
-            {/* RIGHT */}
-            <div className="min-h-0 h-full">
+          {/* RIGHT */}
+          <div className="min-h-0 min-w-0">
             <FocusLayer
-            rows={rows}
-            focusedSet={focusedSet}
-            setFocusedSet={setFocusedSet}
-            totalFocus={totalFocus}
+              rows={rows}
+              focusedSet={focusedSet}
+              setFocusedSet={setFocusedSet}
+              totalFocus={totalFocus}
             />
 
-              {error ? (
-                <div className="mt-3 text-[11px] font-medium text-red-600">
-                  {String(error).slice(0, 140)}
-                </div>
-              ) : null}
-            </div>
+            {error ? (
+              <div className="mt-3 text-[11px] font-medium text-red-600">
+                {String(error).slice(0, 140)}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
