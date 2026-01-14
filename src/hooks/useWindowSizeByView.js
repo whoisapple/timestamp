@@ -2,17 +2,25 @@
 import { useEffect, useRef } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
-/**
- * view === "timer"      : 항상 348x179 강제 + resizable false
- * view === "dashboard"  : "진입 시 1회만" 1440x1024로 맞춤 + resizable true (이후 유저 리사이즈 존중)
- *
- * sizes = {
- *   timer: { w: 348, h: 179 },
- *   dashboard: { w: 1440, h: 1024 },
- * }
- */
+// mac / windows 공통: 강제 중앙
+async function forceCenter(win) {
+  const size = await win.innerSize();
+  const mon = await win.currentMonitor();
+  if (!mon) {
+    await win.center();
+    return;
+  }
+
+  const monPos = mon.position;
+  const monSize = mon.size;
+
+  const x = Math.round(monPos.x + (monSize.width - size.width) / 2);
+  const y = Math.round(monPos.y + (monSize.height - size.height) / 2);
+
+  await win.setPosition({ type: "Logical", x, y });
+}
+
 export function useWindowSizeByView(view, sizes) {
-  const lastAppliedRef = useRef(null); // { view, w, h }
   const lastViewRef = useRef(null);
 
   useEffect(() => {
@@ -20,44 +28,55 @@ export function useWindowSizeByView(view, sizes) {
 
     async function apply() {
       const win = getCurrentWindow();
-
       const target = sizes?.[view];
       if (!target) return;
 
-      // 이미 같은 view에 대해 같은 사이즈 적용했으면 재적용 금지
-      const last = lastAppliedRef.current;
-      const alreadyApplied =
-        last && last.view === view && last.w === target.w && last.h === target.h;
-
-      // view 전환 감지
-      const viewChanged = lastViewRef.current !== view;
+      const prevView = lastViewRef.current;
       lastViewRef.current = view;
 
-      // timer는 항상 강제 고정
-      if (view === "timer") {
-        try {
+      try {
+        // ======================
+        // TIMER MODE (항상 강제)
+        // ======================
+        if (view === "timer") {
+          await win.setAlwaysOnTop(true);
           await win.setResizable(false);
-          await win.setSize({ type: "Logical", width: target.w, height: target.h });
-          await win.center();
+          await win.setSize({
+            type: "Logical",
+            width: target.w,
+            height: target.h,
+          });
+          // 필요하면 중앙
+          // await forceCenter(win);
           if (!alive) return;
-          lastAppliedRef.current = { view, w: target.w, h: target.h };
-        } catch {}
-        return;
-      }
+          return;
+        }
 
-      // dashboard는 "진입 시 1회만" 사이즈 맞춤
-      // (유저가 리사이즈한 걸 다시 덮어쓰지 않기 위해 viewChanged 조건만)
-      if (view === "dashboard") {
-        try {
+        // ======================
+        // DASHBOARD MODE
+        // ======================
+        if (view === "dashboard") {
+          await win.setAlwaysOnTop(false);
           await win.setResizable(true);
 
-          if (viewChanged && !alreadyApplied) {
-            await win.setSize({ type: "Logical", width: target.w, height: target.h });
-            await win.center();
-            if (!alive) return;
-            lastAppliedRef.current = { view, w: target.w, h: target.h };
+          // ✅ "timer → dashboard" 로 전환되는 순간만 복구
+          const enteredFromTimer = prevView === "timer";
+
+          if (enteredFromTimer) {
+            await win.setSize({
+              type: "Logical",
+              width: target.w,
+              height: target.h,
+            });
+
+            // 중앙 복귀
+            await forceCenter(win);
           }
-        } catch {}
+
+          if (!alive) return;
+        }
+      } catch (e) {
+        console.error("[WindowControl] failed:", e);
       }
     }
 
