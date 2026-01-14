@@ -1,8 +1,11 @@
 // src/views/DashboardView.jsx
 import FocusLayer from "../components/FocusLayer";
 import { formatHMS } from "../lib/format";
-import { displayName } from "../lib/appNames";
 import UsageBars from "../components/UsageBars";
+import { useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import WorkPresence30 from "../components/WorkPresence30";
+import DistractionAnalysisCard from "../components/DistractionAnalysisCard";
 
 export default function DashboardView({
   onClickTimer,
@@ -16,7 +19,25 @@ export default function DashboardView({
   topApp,
   switches,
   switchesPerHour,
-}) {
+  hourlyDistraction, // ✅ 추가: App.jsx에서 내려받기
+})  {
+  const [days30, setDays30] = useState([]);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await invoke("get_last_200_days");
+        if (alive) setDays30(res);
+      } catch (e) {
+        console.error("[get_last_200_days] failed:", e);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const FONT_FAMILY =
     '"Monoplex KR", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 
@@ -26,12 +47,10 @@ export default function DashboardView({
   const INSET = "0 0 0 1px rgba(0,0,0,0.06)";
 
   return (
-    // ✅ 핵심: 작은 화면(단일 컬럼)에서는 스크롤 허용, xl부터는 화면 고정
     <div
       className="h-screen w-screen overflow-y-auto overflow-x-hidden xl:overflow-hidden"
       style={{ background: BG }}
     >
-      {/* center + max width */}
       <div
         className="mx-auto w-full max-w-[1440px] px-[24px] pt-[24px] pb-[24px] box-border
                    min-h-screen xl:h-full flex flex-col"
@@ -55,7 +74,6 @@ export default function DashboardView({
         </div>
 
         {/* Content */}
-        {/* ✅ xl(2컬럼)에서는 남은 높이를 다 쓰고, 그 외엔 자연 높이(스크롤) */}
         <div className="mt-[18px] grid gap-[12px] grid-cols-1 xl:grid-cols-[1fr_420px] flex-1 min-h-0">
           {/* LEFT */}
           <div className="min-w-0 flex flex-col min-h-0">
@@ -98,46 +116,38 @@ export default function DashboardView({
                 className="rounded-[24px] p-[22px] h-auto xl:h-[380px]"
                 style={{ background: PANEL, boxShadow: INSET }}
               >
-                <div className="text-[13px] font-medium">Context Switches</div>
-                <div className="mt-[10px] text-[34px] font-semibold leading-none">
-                  {switches}
-                </div>
-                <div className="mt-2 text-[12px] font-medium text-black/55">
-                  Switches / hour: {switchesPerHour || 0}
-                </div>
+                <WorkPresence30 days={days30} />
               </div>
 
               <div
                 className="rounded-[24px] p-[22px] h-auto xl:h-[380px]"
                 style={{ background: PANEL, boxShadow: INSET }}
               >
-                <div className="text-[13px] font-medium">Current App</div>
-                <div className="mt-[10px] text-[24px] font-semibold leading-none">
-                  {displayName(current?.exe)}
-                </div>
-                <div className="mt-2 text-[12px] font-medium text-black/55">
-                  {current?.exe || "-"}
-                </div>
+                <DistractionAnalysisCard
+                  rows={rows}
+                  focusedSet={focusedSet}
+                  totalActive={totalActive}
+                  totalFocus={totalFocus}
+                  hourlyDistraction={hourlyDistraction}
+                />
               </div>
             </div>
 
-            {/* Bottom placeholder */}
-            {/* ✅ xl에서만 남는 높이 먹게 해서 “세로 꽉참” / 작은 화면에서는 자연 높이 */}
+            {/* Bottom */}
             <div
               className="mt-[12px] rounded-[24px] p-[22px] min-h-[220px] xl:flex-1 xl:min-h-0"
               style={{ background: PANEL, boxShadow: INSET }}
             >
-                <UsageBars
-                  rows={rows}
-                  totalActive={totalActive}
-                  focusedSet={focusedSet}
-                  limit={12}
-                />
+              <UsageBars
+                rows={rows}
+                totalActive={totalActive}
+                focusedSet={focusedSet}
+                limit={12}
+              />
             </div>
           </div>
 
           {/* RIGHT */}
-          {/* ✅ 작은 화면에서는 자연 높이(스크롤은 바깥이 담당), xl에서는 세로 꽉 채움 */}
           <div className="min-w-0 xl:h-full xl:min-h-0">
             <div className="xl:h-full xl:min-h-0">
               <FocusLayer
