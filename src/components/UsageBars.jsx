@@ -45,13 +45,13 @@ export default function UsageBars({
               return (
                 <div
                   key={r.exe}
-                  className="rounded-[18px] bg-white px-[14px] py-[12px]"
+                  className="rounded-[16px] bg-white px-[14px] py-[12px]"
                   style={{ boxShadow: "0 0 0 1px rgba(0,0,0,0.06)" }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <div className="truncate text-[13px] font-semibold">
+                        <div className="truncate text-[16px] font-semibold">
                           {displayName(r.exe)}
                         </div>
                         {isFocused ? (
@@ -60,12 +60,12 @@ export default function UsageBars({
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-1 truncate text-[11px] font-medium text-black/45">
+                      <div className="mt-1 truncate text-[14px] font-medium text-black/45">
                         {r.exe}
                       </div>
                     </div>
 
-                    <div className="shrink-0 text-[12px] font-semibold">
+                    <div className="shrink-0 text-[14px] font-semibold">
                       {formatHMS(r.sec)}
                     </div>
                   </div>
