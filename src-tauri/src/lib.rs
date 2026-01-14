@@ -1,5 +1,9 @@
 // src-tauri/src/lib.rs
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate objc;
+
 use serde::Serialize;
 
 mod foreground;
