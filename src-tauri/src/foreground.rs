@@ -53,10 +53,8 @@ pub fn get_foreground_app() -> Result<ForegroundApp, String> {
 
 #[cfg(target_os = "macos")]
 pub fn get_foreground_app() -> Result<ForegroundApp, String> {
-  // macOS: NSWorkspace.sharedWorkspace().frontmostApplication
-  // exe 필드에는 bundle id (권장) -> 프론트에서 displayName 매핑에 쓰기 좋음
   use cocoa::base::{id, nil};
-  use objc::{class, msg_send};
+  use objc::{class, msg_send}; // ✅ sel 제거 (crate root에서 macro_use로 해결)
   use std::ffi::CStr;
 
   unsafe {
@@ -66,11 +64,9 @@ pub fn get_foreground_app() -> Result<ForegroundApp, String> {
       return Err("no frontmost app".into());
     }
 
-    // PID
     let pid_i32: i32 = msg_send![app, processIdentifier];
     let pid: u32 = if pid_i32 > 0 { pid_i32 as u32 } else { 0 };
 
-    // bundleIdentifier 우선
     let bundle_id: id = msg_send![app, bundleIdentifier];
     if bundle_id != nil {
       let cstr: *const std::os::raw::c_char = msg_send![bundle_id, UTF8String];
@@ -80,7 +76,6 @@ pub fn get_foreground_app() -> Result<ForegroundApp, String> {
       }
     }
 
-    // fallback: localizedName
     let name: id = msg_send![app, localizedName];
     if name != nil {
       let cstr: *const std::os::raw::c_char = msg_send![name, UTF8String];
@@ -93,6 +88,7 @@ pub fn get_foreground_app() -> Result<ForegroundApp, String> {
     Err("no bundle id/name".into())
   }
 }
+
 
 #[cfg(not(any(target_os = "windows", target_os = "macos")))]
 pub fn get_foreground_app() -> Result<ForegroundApp, String> {
