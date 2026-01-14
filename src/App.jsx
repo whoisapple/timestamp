@@ -4,11 +4,15 @@ import { useMemo, useState, useEffect } from "react";
 import { displayName } from "./lib/appNames";
 import { useWorklog } from "./hooks/useWorklog";
 import { useWindowSizeByView } from "./hooks/useWindowSizeByView";
+import { invoke } from "@tauri-apps/api/core";
 import DashboardView from "./views/DashboardView";
 import TimerView from "./views/TimerView";
 
 const DASH = { w: 1440, h: 1024, resizable: true };
 const TIMER = { w: 363, h: 220, resizable: false };
+const fg = await invoke("get_foreground_app");
+
+
 
 export default function App() {
   const [view, setView] = useState("dashboard"); // "dashboard" | "timer"

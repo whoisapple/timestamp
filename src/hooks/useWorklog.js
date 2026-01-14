@@ -13,6 +13,7 @@ function localDayKey(d = new Date()) {
 
 /**
  * ✅ active/focus delta 저장 (10초 flush)
+ * - Rust command args가 activeDelta/focusDelta를 요구하는 상태에 맞춤
  */
 function usePersistDailyDeltas({ totalActive, totalFocus }) {
   const lastRef = useRef({ a: 0, f: 0 });
@@ -41,9 +42,8 @@ function usePersistDailyDeltas({ totalActive, totalFocus }) {
 
       try {
         await invoke("record_today_deltas", {
-          // ✅ snake_case로 보내는 게 가장 안전
-          active_delta: sendA,
-          focus_delta: sendF,
+          activeDelta: sendA,
+          focusDelta: sendF,
         });
       } catch (e) {
         pendingRef.current.a += sendA;
@@ -95,10 +95,8 @@ export function useWorklog(focusedSet) {
         const snap = await invoke("get_today_snapshot");
         if (!alive || !snap) return;
 
-        // Rust(Local) day를 currentDay로 맞춤
         if (typeof snap.day === "string") setCurrentDay(snap.day);
 
-        // exe_seconds 복구
         if (snap.exe_seconds && typeof snap.exe_seconds === "object") {
           const out = {};
           for (const [k, v] of Object.entries(snap.exe_seconds)) {
@@ -107,10 +105,8 @@ export function useWorklog(focusedSet) {
           setSecondsByExe(out);
         }
 
-        // switches 복구
         if (typeof snap.switches === "number") setSwitches(Number(snap.switches) || 0);
 
-        // hourly_distraction 복구
         if (Array.isArray(snap.hourly_distraction) && snap.hourly_distraction.length === 24) {
           setHourlyDistraction(snap.hourly_distraction.map((x) => Number(x) || 0));
         }
@@ -147,6 +143,9 @@ export function useWorklog(focusedSet) {
           pendingExeRef.current = {};
           pendingSwitchRef.current = 0;
           pendingHourlyRef.current = Array(24).fill(0);
+
+          // ✅ Rust store와 day 동기화 (필요 시)
+          await invoke("get_today_snapshot").catch(() => {});
 
           setError(null);
           return;
@@ -237,7 +236,7 @@ export function useWorklog(focusedSet) {
       if (sw > 0) {
         pendingSwitchRef.current = 0;
         try {
-          await invoke("record_today_switches", { switches_delta: sw });
+          await invoke("record_today_switches", { switchesDelta: sw });
         } catch (e) {
           pendingSwitchRef.current += sw;
           console.error("[persist] record_today_switches failed:", e);
@@ -258,13 +257,17 @@ export function useWorklog(focusedSet) {
         }
       }
 
-      // exe
+      // exe (✅ command이 요구하는 키: exeDeltas, 타입: sequence)
       const exeMap = pendingExeRef.current;
-      const entries = Object.entries(exeMap).filter(([, v]) => (v || 0) > 0);
+      const entries = Object.entries(exeMap)
+        .map(([k, v]) => [k, Number(v) || 0])
+        .filter(([, v]) => v > 0);
+
       if (entries.length > 0) {
-        pendingExeRef.current = {};
+        pendingExeRef.current = {}; // flush optimistic
         try {
-          await invoke("record_today_exe_deltas", { exe_deltas: entries });
+          // ✅ Rust command wrapper가 요구: { exeDeltas: Vec<(String,u64)> }
+          await invoke("record_today_exe_deltas", { exeDeltas: entries });
         } catch (e) {
           for (const [k, v] of entries) {
             pendingExeRef.current[k] = (pendingExeRef.current[k] ?? 0) + (v || 0);

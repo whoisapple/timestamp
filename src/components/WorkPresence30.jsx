@@ -1,6 +1,12 @@
 // src/components/WorkPresence30.jsx
 import { useMemo, useState } from "react";
 
+function localDayKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 /**
  * days: [{ day: "YYYY-MM-DD", worked: boolean }]
  * UI: 20 x 10 = 200 dots
@@ -32,7 +38,7 @@ export default function WorkPresence30({ days = [] }) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
 
-      const key = d.toISOString().slice(0, 10);
+      const key = localDayKey(d);
       const found = dayMap.get(key);
 
       if (found) {
@@ -50,8 +56,9 @@ export default function WorkPresence30({ days = [] }) {
       }
     }
 
-    return arr; // [0] = 오늘 = 좌상단
+    return arr; // [0] = 오늘
   }, [dayMap]);
+
 
   const workedCount = useMemo(
     () => cells.filter((c) => c.worked).length,
