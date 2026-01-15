@@ -13,7 +13,7 @@ import { initAnalytics, track } from "./lib/analytics";
 const SIZE_PRESETS = {
   macos: {
     dashboard: { w: 1400, h: 980, resizable: true },
-    timer: { w: 360, h: 210, resizable: false },
+    timer: { w: 360, h: 248, resizable: false },
   },
   windows: {
     dashboard: { w: 1440, h: 1024, resizable: true },
