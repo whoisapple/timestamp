@@ -1,46 +1,13 @@
-name: release
+name: tag-trigger-test
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - "v*"
 
 jobs:
-  build:
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
-
+  test:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install deps
-        run: npm ci
-
-      - name: Build + Release to timestamp-updates
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      with:
-        owner: whoisapple
-        repo: timestamp-updates
-        tagName: ${{ github.ref_name }}
-        releaseName: "TimeStamp ${{ github.ref_name }}"
-        targetCommitish: main
-        releaseDraft: false
-        prerelease: false
+      - name: Test
+        run: echo "tag trigger works"
