@@ -1,3 +1,5 @@
+
+
 // src-tauri/src/lib.rs
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[cfg(target_os = "macos")]
@@ -10,6 +12,7 @@ use tauri::Manager;
 use tauri_plugin_store::StoreExt;
 use serde::Serialize;
 mod idle;
+use idle::get_idle_time_ms;
 mod foreground;
 mod worklog_store;
 
@@ -60,7 +63,7 @@ pub fn run() {
         get_last_200_days,
         debug_store_dir,
         ensure_store_file,
-        idle::get_idle_time_ms
+        get_idle_time_ms
         ])
 
         .run(tauri::generate_context!())
@@ -103,9 +106,14 @@ fn get_last_200_days(app: tauri::AppHandle) -> Result<Vec<worklog_store::DayStat
 
 #[tauri::command]
 fn debug_store_dir(app: tauri::AppHandle) -> Result<String, String> {
-let dir = app.path().app_data_dir().unwrap();
+  let dir = app
+    .path()
+    .app_data_dir()
+    .map_err(|e| e.to_string())?;
+
   Ok(dir.to_string_lossy().to_string())
 }
+
 
 #[tauri::command]
 fn ensure_store_file(app: tauri::AppHandle) -> Result<(), String> {
