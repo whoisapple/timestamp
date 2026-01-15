@@ -9,7 +9,7 @@ extern crate objc;
 use tauri::Manager;
 use tauri_plugin_store::StoreExt;
 use serde::Serialize;
-
+mod idle;
 mod foreground;
 mod worklog_store;
 
@@ -19,6 +19,11 @@ pub struct ForegroundApp {
   pub pid: u32,    // macOS에서 PID 못 구하면 0
   pub name: String,  // ✅ 표시명
 }
+
+
+
+
+
 
 #[tauri::command]
 fn get_foreground_app() -> Result<ForegroundApp, String> {
@@ -50,7 +55,9 @@ pub fn run() {
         record_today_exe_deltas,
         get_last_200_days,
         debug_store_dir,
-        ensure_store_file,])
+        ensure_store_file,
+        idle::get_idle_time_ms
+        ])
         .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
