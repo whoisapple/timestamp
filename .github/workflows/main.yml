@@ -36,10 +36,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        with:
-          owner: whoisapple
-          repo: timestamp-updates
-          tagName: ${{ github.ref_name }}
-          releaseName: "TimeStamp ${{ github.ref_name }}"
-          releaseDraft: false
-          prerelease: false
+      with:
+        owner: whoisapple
+        repo: timestamp-updates
+        tagName: ${{ github.ref_name }}
+        releaseName: "TimeStamp ${{ github.ref_name }}"
+        targetCommitish: main
+        releaseDraft: false
+        prerelease: false
