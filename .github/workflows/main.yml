@@ -6,17 +6,13 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: read
-
 jobs:
   build:
-    name: Build & release (${{ matrix.platform }})
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
         platform: [macos-latest, windows-latest]
-
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -34,7 +30,7 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Build + upload release assets to public updates repo
+      - name: Build + Release to timestamp-updates
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
