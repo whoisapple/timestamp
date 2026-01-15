@@ -22,6 +22,14 @@
       "csp": null
     }
   },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/whoisapple/timestamp-updates/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEIwQjQzRDU0QjE4QUIxN0YKUldSL3NZcXhWRDIwc0ZWN0FtVDJIanpsVWtMbmZnWHB1aTJ1VFR1ZncwNFFsdi85Sm0vTWt2SkMK"
+    }
+  },
   "bundle": {
     "active": true,
     "targets": ["app", "dmg"],
@@ -32,4 +40,5 @@
       "icons/icon.ico"
     ]
   }
+  
 }

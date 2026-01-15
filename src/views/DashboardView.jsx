@@ -6,6 +6,30 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import WorkPresence30 from "../components/WorkPresence30";
 import DistractionAnalysisCard from "../components/DistractionAnalysisCard";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
+
+export async function checkAndUpdate() {
+  console.log("[updater] clicked");
+
+  try {
+    const update = await check();
+    console.log("[updater] check result:", update);
+
+    if (update?.available) {
+      console.log("[updater] downloading...");
+      await update.downloadAndInstall();
+      console.log("[updater] installed, relaunching...");
+      await relaunch();
+    } else {
+      console.log("[updater] no update available");
+      alert("이미 최신 버전이에요.");
+    }
+  } catch (e) {
+    console.error("[updater] error:", e);
+    alert(String(e));
+  }
+}
 
 export default function DashboardView({
   onClickTimer,
@@ -69,6 +93,13 @@ export default function DashboardView({
               onClick={onClickTimer}
             >
               View Timer
+            </button>
+            <button
+              className="h-[34px] rounded-full bg-black px-5 text-[14px] font-semibold text-white"
+              title="Check for updates"
+              onClick={checkAndUpdate}
+            >
+              Check for updates          
             </button>
           </div>
         </div>
