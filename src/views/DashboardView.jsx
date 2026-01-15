@@ -94,13 +94,6 @@ export default function DashboardView({
             >
               View Timer
             </button>
-            <button
-              className="h-[34px] rounded-full bg-black px-5 text-[14px] font-semibold text-white"
-              title="Check for updates"
-              onClick={checkAndUpdate}
-            >
-              Check for updates          
-            </button>
           </div>
         </div>
 
