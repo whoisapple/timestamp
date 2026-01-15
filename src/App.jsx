@@ -1,80 +1,144 @@
 // src/App.jsx
 import "./index.css";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { displayName } from "./lib/appNames";
 import { useWorklog } from "./hooks/useWorklog";
 import { useWindowSizeByView } from "./hooks/useWindowSizeByView";
 import { invoke } from "@tauri-apps/api/core";
 import DashboardView from "./views/DashboardView";
 import TimerView from "./views/TimerView";
+import { enable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { initAnalytics, track } from "./lib/analytics";
 
-const DASH = { w: 1440, h: 1024, resizable: true };
-const TIMER = { w: 363, h: 220, resizable: false };
-const fg = await invoke("get_foreground_app");
+const SIZE_PRESETS = {
+  macos: {
+    dashboard: { w: 1400, h: 980, resizable: true },
+    timer: { w: 360, h: 210, resizable: false },
+  },
+  windows: {
+    dashboard: { w: 1440, h: 1024, resizable: true },
+    timer: { w: 380, h: 240, resizable: false },
+  },
+  unknown: {
+    dashboard: { w: 1440, h: 1024, resizable: true },
+    timer: { w: 363, h: 220, resizable: false },
+  },
+};
 
 
+const detectOS = () => {
+  const ua = navigator.userAgent.toLowerCase();
+  if (ua.includes("mac")) return "macos";
+  if (ua.includes("win")) return "windows";
+  return "unknown";
+};
 
 export default function App() {
-  const [view, setView] = useState("dashboard"); // "dashboard" | "timer"
-  const [focusedSet, setFocusedSet] = useState(() => new Set()); // ✅ multi focus
+  const [view, setView] = useState("dashboard");
+  const [focusedSet, setFocusedSet] = useState(() => new Set());
+  const os = useMemo(() => detectOS(), []);
+  const windowSizes = useMemo(() => {
+    return SIZE_PRESETS[os] || SIZE_PRESETS.unknown;
+  }, [os]);
 
-  // ✅ useWorklog는 1번만 호출
+
+  // 1) App Opened (마운트 1회)
+  useEffect(() => {
+    initAnalytics();
+    track("App Opened", { os });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ✅ 부팅 시 자동 실행 활성화 (마운트 1회)
+  useEffect(() => {
+    (async () => {
+      try {
+        const enabled = await isEnabled();
+        if (!enabled) {
+          await enable();
+          console.log("Autostart enabled");
+        }
+      } catch (e) {
+        console.error("Autostart setup failed:", e);
+      }
+    })();
+  }, []);
+
+
   const {
     rows,
     totalActive,
-    totalFocus, // useWorklog에서 계산된 값 사용
+    totalFocus,
     current,
     error,
     switches,
     switchesPerHour,
     secondsByExe,
     hourlyDistraction,
+    isIdle,
+    idleMs,
   } = useWorklog(focusedSet);
 
-  // ✅ 새로고침 막기 (PROD에서만 권장)
+  // 2) View Changed (변할 때만)
+  const prevViewRef = useRef(view);
   useEffect(() => {
-    // 개발 중이면 주석 해제해서 DEV에서는 허용 가능
-    // if (!import.meta.env.PROD) return;
+    const prev = prevViewRef.current;
+    if (prev !== view) {
+      track("View Changed", { from: prev, to: view, os });
+      prevViewRef.current = view;
+    }
+  }, [view, os]);
 
+  // 3) Idle Detected/Recovered (변할 때만, 스팸 방지)
+  const prevIdleRef = useRef(!!isIdle);
+  useEffect(() => {
+    const prev = prevIdleRef.current;
+    const curr = !!isIdle;
+    if (prev === curr) return;
+
+    if (curr) track("Idle Detected", { os, idleMs: Math.floor(idleMs || 0) });
+    else track("Idle Recovered", { os, idleMs: Math.floor(idleMs || 0) });
+
+    prevIdleRef.current = curr;
+  }, [isIdle, idleMs, os]);
+
+  // 4) Focus Changed (개수만)
+  const prevFocusCountRef = useRef(focusedSet.size);
+  useEffect(() => {
+    const prev = prevFocusCountRef.current;
+    const curr = focusedSet.size;
+    if (prev !== curr) {
+      track("Focus Changed", { os, count: curr });
+      prevFocusCountRef.current = curr;
+    }
+  }, [focusedSet, os]);
+
+  // ---- 이하 기존 로직 유지 ----
+
+  useEffect(() => {
     const onKeyDown = (e) => {
       const key = (e.key || "").toLowerCase();
-
-      // F5
       if (key === "f5") {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
+        e.preventDefault(); e.stopPropagation(); return;
       }
-
-      // Ctrl+R / Cmd+R
       if ((e.ctrlKey || e.metaKey) && key === "r") {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
+        e.preventDefault(); e.stopPropagation(); return;
       }
-
-      // Ctrl+Shift+R / Cmd+Shift+R
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && key === "r") {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
+        e.preventDefault(); e.stopPropagation(); return;
       }
     };
-
     window.addEventListener("keydown", onKeyDown, { capture: true });
     return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
   }, []);
 
-  // ✅ view에 따라 윈도우 사이즈 제어
-  useWindowSizeByView(view, { dashboard: DASH, timer: TIMER });
+  useWindowSizeByView(view, windowSizes);
 
   const topApp = useMemo(() => {
     if (!rows.length) return "-";
     return displayName(rows[0].exe);
   }, [rows]);
 
-  // ✅ TimerView용 totalFocus는 현재 focusSet 기준으로 secondsByExe에서 재계산
-  // (useWorklog.totalFocus는 이미 focusedSet 기반이지만, 안전하게 동일한 방식 유지 가능)
   const totalFocusForTimer = useMemo(() => {
     let sum = 0;
     for (const exe of focusedSet) sum += secondsByExe[exe] ?? 0;
@@ -98,16 +162,13 @@ export default function App() {
   useEffect(() => {
     const raw = localStorage.getItem("focusedSet");
     if (raw) {
-      try {
-        setFocusedSet(new Set(JSON.parse(raw)));
-      } catch {}
+      try { setFocusedSet(new Set(JSON.parse(raw))); } catch {}
     }
   }, []);
-  
+
   useEffect(() => {
     localStorage.setItem("focusedSet", JSON.stringify([...focusedSet]));
   }, [focusedSet]);
-  
 
   if (view === "timer") {
     return (
@@ -120,7 +181,6 @@ export default function App() {
   }
 
   return (
-    
     <DashboardView
       onClickTimer={() => setView("timer")}
       rows={rows}
@@ -129,7 +189,7 @@ export default function App() {
       focusedSet={focusedSet}
       setFocusedSet={setFocusedSet}
       totalActive={totalActive}
-      totalFocus={totalFocus} // ✅ useWorklog 값 사용
+      totalFocus={totalFocus}
       topApp={topApp}
       switches={switches}
       switchesPerHour={switchesPerHour}
