@@ -5417,6 +5417,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cocoa",
+ "core-graphics 0.23.2",
  "objc",
  "serde",
  "serde_json",
