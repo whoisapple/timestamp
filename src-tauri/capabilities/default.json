@@ -16,6 +16,10 @@
     "updater:default",
     "updater:allow-check",
     "updater:allow-download-and-install",
-    "process:default"
+    "process:default",
+    "autostart:default",
+    "autostart:allow-is-enabled",
+    "autostart:allow-enable",
+    "autostart:allow-disable"
   ]
 }
