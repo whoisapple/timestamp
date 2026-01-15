@@ -14,19 +14,15 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install deps
-        run: npm ci
+      - run: npm ci
 
       - name: Build + Release to timestamp-updates
         uses: tauri-apps/tauri-action@v0
@@ -37,8 +33,7 @@ jobs:
         with:
           owner: whoisapple
           repo: timestamp-updates
-          tagName: ${{ github.ref_name }}
+          tagName: ${{ github.ref_name }}   # ✅ 반드시 ref_name
           releaseName: "TimeStamp ${{ github.ref_name }}"
-          targetCommitish: main
           releaseDraft: false
           prerelease: false
