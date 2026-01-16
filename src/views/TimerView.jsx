@@ -17,7 +17,7 @@ export default function TimerView({ totalFocus, focusedCount, onBack }) {
       }}
       className="select-none"
     >
-      <div className=" w-full px-[16px] pt-[16px] pb-[16px]">
+      <div className=" w-full px-[16px] pt-[16px] pb-[12px]">
         <div className="text-center text-[18px] font-medium tracking-tight">
           Total Focus Time
         </div>
