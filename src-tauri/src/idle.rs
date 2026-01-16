@@ -51,7 +51,7 @@ pub fn get_idle_time_ms() -> u64 {
         let ok = CFNumberGetValue(cf_num, kCFNumberSInt64Type, &mut nanos as *mut _ as *mut _);
         CFRelease(cf_num as *const _);
 
-        if ok == 0 || nanos < 0 {
+        if !ok || nanos < 0 {
             return 0;
         }
 
