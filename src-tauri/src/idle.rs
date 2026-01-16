@@ -1,62 +1,68 @@
-use core_foundation::base::{kCFAllocatorDefault, CFRelease, TCFType};
+// src/idle.rs
 
+// -----------------------------
+// macOS
+// -----------------------------
 #[cfg(target_os = "macos")]
 #[tauri::command]
 pub fn get_idle_time_ms() -> u64 {
     use core_foundation::base::{kCFAllocatorDefault, CFRelease, TCFType};
     use core_foundation::number::{CFNumberGetValue, CFNumberRef, kCFNumberSInt64Type};
     use core_foundation::string::CFString;
+
     use io_kit_sys::{
-        IORegistryEntryCreateCFProperty, IOServiceGetMatchingService, IOServiceMatching, IOObjectRelease,
+        kIOMasterPortDefault,
+        types::io_registry_entry_t,
+        IORegistryEntryCreateCFProperty,
+        IOServiceGetMatchingService,
+        IOServiceMatching,
+        IOObjectRelease,
     };
-    use std::ffi::CString;
 
     unsafe {
-        let class = match CString::new("IOHIDSystem") {
-            Ok(v) => v,
-            Err(_) => return 0,
-        };
-
-        let matching = IOServiceMatching(class.as_ptr());
+        // HIDSystem 서비스 찾기
+        let matching = IOServiceMatching(b"IOHIDSystem\0".as_ptr() as *const _);
         if matching.is_null() {
             return 0;
         }
 
-        let service = IOServiceGetMatchingService(0, matching);
+        let service: io_registry_entry_t =
+            IOServiceGetMatchingService(kIOMasterPortDefault, matching);
         if service == 0 {
             return 0;
         }
 
-        // ✅ CFString 임시값 금지: 변수로 잡아서 lifetime 유지
-        let key_str = CFString::new("HIDIdleTime");
-        let key = key_str.as_concrete_TypeRef();
+        // "HIDIdleTime" 읽기 (ns 단위)
+        let key = CFString::new("HIDIdleTime");
+        let cf_num = IORegistryEntryCreateCFProperty(
+            service,
+            key.as_concrete_TypeRef(),
+            kCFAllocatorDefault,
+            0,
+        ) as CFNumberRef;
 
-        let cf_prop = IORegistryEntryCreateCFProperty(service, key, kCFAllocatorDefault, 0);
-
-        // ✅ service release (누수 방지, 크래시 원인은 아니지만 정리)
         IOObjectRelease(service);
 
-        if cf_prop.is_null() {
+        if cf_num.is_null() {
             return 0;
         }
 
         let mut nanos: i64 = 0;
-        let ok = CFNumberGetValue(
-            cf_prop as CFNumberRef,
-            kCFNumberSInt64Type,
-            &mut nanos as *mut _ as *mut _,
-        );
+        let ok = CFNumberGetValue(cf_num, kCFNumberSInt64Type, &mut nanos as *mut _ as *mut _);
+        CFRelease(cf_num as *const _);
 
-        CFRelease(cf_prop);
-
-        if !ok {
+        if !ok || nanos < 0 {
             return 0;
         }
 
+        // ns -> ms
         (nanos as u64) / 1_000_000
     }
 }
 
+// -----------------------------
+// Windows
+// -----------------------------
 #[cfg(target_os = "windows")]
 #[tauri::command]
 pub fn get_idle_time_ms() -> u64 {
@@ -69,12 +75,21 @@ pub fn get_idle_time_ms() -> u64 {
             dwTime: 0,
         };
 
-        if !GetLastInputInfo(&mut lii).as_bool() {
-            return 0;
+        if GetLastInputInfo(&mut lii).as_bool() {
+            let now = GetTickCount() as u64;
+            let last = lii.dwTime as u64;
+            now.saturating_sub(last)
+        } else {
+            0
         }
-
-        // GetTickCount: ms since system start (u32 wrap-around 가능하지만 idle 용도로 충분)
-        let now = GetTickCount();
-        now.wrapping_sub(lii.dwTime) as u64
     }
+}
+
+// -----------------------------
+// fallback (linux/other)
+// -----------------------------
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+#[tauri::command]
+pub fn get_idle_time_ms() -> u64 {
+    0
 }
