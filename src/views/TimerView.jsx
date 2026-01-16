@@ -17,21 +17,21 @@ export default function TimerView({ totalFocus, focusedCount, onBack }) {
       }}
       className="select-none"
     >
-      <div className=" w-full px-[22px] pt-[18px] pb-[16px]">
+      <div className=" w-full px-[16px] pt-[16px] pb-[16px]">
         <div className="text-center text-[18px] font-medium tracking-tight">
           Total Focus Time
         </div>
 
-        <div className="mt-[10px] text-center text-[56px] font-semibold leading-none">
+        <div className="mt-[0px] text-center text-[48px] font-semibold leading-none">
           {formatHMS(totalFocus)}
         </div>
 
-        <div className="mt-[6px] text-center text-[12px] font-medium text-black/55">
+        <div className="mt-[4px] text-center text-[13px] font-medium text-black/55">
           Focused apps: {focusedCount}
         </div>
 
         <button
-          className="mt-[12px] h-[56px] w-full rounded-[22px] bg-black text-[18px] font-semibold text-white active:scale-[0.99]"
+          className="mt-[12px] h-[48px] w-full rounded-[16px] bg-black text-[16px] font-semibold text-white active:scale-[0.95]"
           onClick={onBack}
           title="Back to Dashboard"
         >

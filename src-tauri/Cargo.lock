@@ -3,6 +3,31 @@
 version = 4
 
 [[package]]
+name = "TimeStamp"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "cocoa",
+ "core-foundation 0.9.4",
+ "core-graphics 0.23.2",
+ "io-kit-sys",
+ "objc",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-opener",
+ "tauri-plugin-os",
+ "tauri-plugin-process",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "windows",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5588,31 +5613,6 @@ name = "wit-bindgen"
 version = "0.46.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f17a85883d4e6d00e8a97c586de764dabcc06133f7f1d55dce5cdc070ad7fe59"
-
-[[package]]
-name = "work-timer"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "cocoa",
- "core-foundation 0.9.4",
- "core-graphics 0.23.2",
- "io-kit-sys",
- "objc",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-opener",
- "tauri-plugin-os",
- "tauri-plugin-process",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "windows",
-]
 
 [[package]]
 name = "writeable"

@@ -17,7 +17,7 @@ const SIZE_PRESETS = {
   },
   windows: {
     dashboard: { w: 1440, h: 1024, resizable: true },
-    timer: { w: 380, h: 220, resizable: false },
+    timer: { w: 340, h: 192, resizable: false },
   },
   unknown: {
     dashboard: { w: 1440, h: 1024, resizable: true },
