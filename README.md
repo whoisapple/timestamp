@@ -2,6 +2,9 @@
 
 Windows와 macOS에서 실행 중인 앱 사용 시간과 집중 시간을 기록하고 시각화하는 데스크톱 앱입니다. 사용자가 집중할 앱을 지정하면 일반 활성 시간과 집중 시간을 나누어 볼 수 있습니다.
 
+<img width="3840" height="2160" alt="image" src="https://github.com/user-attachments/assets/86e6c6df-ed52-471f-bd43-69b9da4dc425" />
+
+
 ## 주요 기능
 
 - 현재 포그라운드 앱을 바탕으로 앱별 사용 시간 집계
